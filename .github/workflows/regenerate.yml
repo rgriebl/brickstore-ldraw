@@ -17,15 +17,11 @@ jobs:
 
     - name: Checkout BrickStore
       run: |
-        echo -n "Downloading latest script and mappings..."
-        mkdir -p ldraw-temp
-        cd ldraw-temp
+        mkdir -p temp
+        cd temp
         git clone --depth 1 --filter=blob:none --sparse https://github.com/rgriebl/brickstore.git
         cd brickstore
         git sparse-checkout set --no-cone /ldraw
-        cd ..
-        cd ..
-        echo "done"
       shell: bash
 
     - name: Update Mappings
@@ -33,14 +29,14 @@ jobs:
       run: |
         sudo DEBIAN_FRONTEND=noninteractive apt -y update
         sudo DEBIAN_FRONTEND=noninteractive apt -y install python3-cbor2 python3-tqdm
-        stdbuf -oL -eL ./ldraw-temp/brickstore/ldraw/create-bricklink-ldraw-id-mappings.py \
-            -t ldraw-temp \
-            -a ldraw-temp/brickstore/ldraw/mappings \
-            -o ldraw/complete.zip \
+        ./temp/brickstore/ldraw/create-bricklink-ldraw-id-mappings.py \
+            -t temp \
+            -a temp/brickstore/ldraw/mappings \
+            -o complete.zip \
             2>&1  | tee >(gzip -c > log-`date -Iseconds`.log.gz)
 
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "ldraw/complete.zip,log-*.gz"
+        artifacts: "complete.zip,log-*.gz"
         commit: main
         tag: ${{ env.TAGNAME }}
