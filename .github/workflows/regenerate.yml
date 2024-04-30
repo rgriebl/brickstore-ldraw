@@ -41,5 +41,5 @@ jobs:
       with:
         artifacts: "complete.zip,regenerate.log"
         commit: main
-        tag: ${{ env.TAGNAME }}
+        tag: ${{ env.TAG_NAME }}
         name: ${{ env.RELEASE_NAME }}
